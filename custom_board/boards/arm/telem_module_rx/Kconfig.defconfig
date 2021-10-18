@@ -1,0 +1,10 @@
+# board configuration
+# Copyright (c) 2021, Vitaliy Nimych <vitaliy.nimych@gmail.com>
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_TELEM_MODULE_RX
+
+config BOARD
+	default "telem_module_rx"
+
+endif # BOARD

@@ -1,0 +1,19 @@
+identifier: telem_module_tx
+name: TELEMETRY-MODULE-TX
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
+ram: 128
+flash: 1024
+supported:
+  - counter
+  - can
+  - gpio
+  - i2c
+  - spi
+  - watchdog
+  - adc
+  - dac

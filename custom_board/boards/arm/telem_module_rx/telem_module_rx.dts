@@ -1,0 +1,114 @@
+/*
+ * Copyright (c) 2021, Vitaliy Nimych <vitaliy.nimych@gmail.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/f4/stm32f405Xg.dtsi>
+#include <st/f4/stm32f405rgtx-pinctrl.dtsi>
+
+/ {
+	model = "Telemetry module RX board";
+	compatible = "telem,stm32-f405";
+
+	chosen {
+		zephyr,console = &usart2;
+		zephyr,shell-uart = &usart2;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,ccm = &ccm0;
+		//zephyr,can-primary = &can1;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led_1: led_1 {
+			gpios = <&gpioc 0 GPIO_ACTIVE_HIGH>;
+			label = "LED1";
+		};
+
+		led_2: led_2 {
+			gpios = <&gpioc 1 GPIO_ACTIVE_HIGH>;
+			label = "LED2";
+		};
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		user_button: button {
+			label = "Key";
+			gpios = <&gpioa 0 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	aliases {
+		led0 = &led_1;
+		led1 = &led_2;
+		sw0 = &user_button;
+		lora0 = &lora;
+	};
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(8)>;
+	status = "okay";
+};
+
+&pll {
+	div-m = <4>;
+	mul-n = <168>;
+	div-p = <2>;
+	div-q = <7>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(168)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <2>;
+};
+
+&usart2 {
+	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&rtc {
+	status = "okay";
+};
+
+
+&rng {
+	status = "okay";
+};
+
+
+&spi1 {
+	status = "okay";
+	pinctrl-0 = <&spi1_sck_pa5 &spi1_miso_pa6 &spi1_mosi_pa7>;
+    cs-gpios = <&gpioa 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+	lora: sx1276@0 {
+		compatible = "semtech,sx1276";
+		reg = <0>;
+		label = "sx1276";
+		reset-gpios = <&gpiob 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		pa-boost-enable-gpios = <&gpiob 12 GPIO_ACTIVE_LOW>;
+		//rfo-enable-gpios = <&gpiob 13 GPIO_ACTIVE_LOW>;
+		rfi-enable-gpios = <&gpiob 13 GPIO_ACTIVE_LOW>;
+
+		dio-gpios = <&gpioc 4 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>,
+        <&gpioc 5 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>,
+        <&gpiob 0 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>,
+        <&gpiob 1 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>,
+        <&gpiob 2 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+		spi-max-frequency = <1000000>;
+		//power-amplifier-output = "pa-boost";
+	};
+};
+
